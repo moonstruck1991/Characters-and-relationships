@@ -60,11 +60,23 @@ class Graph{
 	public Graph(ArrayList<edge> edgelist, ArrayList<node> nodelist){
 		this.edgelist = edgelist;
 		this.nodelist = nodelist;
+		// System.out.println("nodes");
+		//  for (int i = 0; i < nodelist.size(); i++) {
+  //     		System.out.print(nodelist.get(i).Id);
+		//  }
+		//  System.out.println(" ");
+		//  		 System.out.print("edges");
+		//  		 System.out.println(" " + edgelist.size());
+		//  for (int i = 0; i < edgelist.size(); i++) {
+  //     		System.out.print(edgelist.get(i).Source);
+		//  }
+		//  	 System.out.println(" ");
 		this.adj = new ArrayList<ArrayList<String>>();
 		 for (int i = 0; i < nodelist.size(); i++) {
       		ArrayList<String> adjnodes = new ArrayList<String>();
+      		adjnodes.add(nodelist.get(i).getId());
       		for(int j = 0; j< edgelist.size(); j++){
-      			if(edgelist.get(j).getS() == nodelist.get(i).getId()){
+      			if(edgelist.get(j).getS().compareTo(nodelist.get(i).getId()) == 0){
       				adjnodes.add(edgelist.get(j).getT());
       			}
       		}
@@ -80,36 +92,32 @@ class Graph{
     	System.out.println(roundOff);
 	}
 
-	public void qsort(ArrayList<sizeNname> arr, int l, int r){
+	public void qsort(sizeNname[] arr, int l, int r){
 		if(l>=r){
 			return;
 		}
 
-		sizeNname p = arr.get(l);
+		sizeNname p = arr[l];
 		int i = l;
 		int j = r;
 		while(i < j && i <=r ){
-			while(i <= r && (arr.get(i).size > p.size || (arr.get(i).size == p.size && arr.get(i).name.compareTo(p.name) >= 0))){
+			while(i <= r && (arr[i].size >= p.size || (arr[i].size == p.size && arr[i].name.compareTo(p.name) <= 0))){
 				i++;
 			}
-			while(arr.get(j).size < p.size && j >=l ){
+			while(j >= l && (arr[j].size < p.size || (arr[j].size == p.size && arr[j].name.compareTo(p.name) > 0))){
 				j--;
 			}
 			if(i<j){
-				sizeNname temp = arr.get(i);
-                arr.get(i).size = arr.get(j).size;
-                arr.get(i).name = arr.get(j).name;
-                arr.get(j).size = temp.size;
-                arr.get(j).name = temp.name;
-			}
-			System.out.println(i);
+				sizeNname temp = arr[i];
+                arr[i] = arr[j];
+                arr[j] = temp;
+  			}
+			
 					
 		}
-		arr.get(l).size = arr.get(j).size;
-		arr.get(l).name = arr.get(j).name;
+		arr[l] = arr[j];
+		arr[j] = p;
 		
-		arr.get(j).size = p.size;
-		arr.get(j).name = p.name;
 		qsort(arr,l,j-1);
 		qsort(arr,j+1,r);
 	}
@@ -118,18 +126,19 @@ class Graph{
 
 	public void rank(){					// Part 2
 		int n = adj.size();
-		ArrayList<sizeNname> sNn = new ArrayList<>();
+		sizeNname[] sNn = new sizeNname[n];
 		for(int i=0; i<n; i++){			// size array
-			sizeNname temp = new sizeNname(adj.get(i).size(), adj.get(i).get(0));
-			sNn.add(temp);
+			sizeNname temp = new sizeNname(adj.get(i).size() , adj.get(i).get(0));
+			sNn[i]= temp;
+			
 		}
 
+		// for(int i=0; i<n; i++){
+		// 	System.out.print(sNn.get(i).size + ",");	
+		// }
+		this.qsort(sNn, 0, n-1);		// sorting acc. to size 
 		for(int i=0; i<n; i++){
-			System.out.print(sNn.get(i).size + ",");	
-		}
-		// this.qsort(sNn, 0, n-1);		// sorting acc. to size 
-		for(int i=0; i<n; i++){
-			System.out.print(sNn.get(i).name + ",");	
+			System.out.print(sNn[i].name + ",");	
 		}					
 	} 
 
@@ -180,7 +189,7 @@ public class assignment4{
 		
 
 		Graph G = new Graph(edgelist,nodelist);
-		G.aver();
+		
 		G.rank();
 	}
 }
