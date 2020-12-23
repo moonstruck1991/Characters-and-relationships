@@ -20,8 +20,34 @@ public class Graph{
 	}
 
 	public void qsort(int[] arr, int l, int r){
+		if(l>=r){
+			return;
+		}
 
+		int p = arr[l];
+		int i = l;
+		int j = r;
+		while(i < j && i <=r ){
+			while(i <= r && arr[i] <= p){
+				i++;
+			}
+			while(arr[j] > p && j >=l ){
+				j--;
+			}
+			if(i<j){
+				int temp = arr[i];
+                arr[i] = arr[j];
+                arr[j] = temp;
+			}
+					
+		}
+		arr[l] = arr[j];
+		arr[j] = p;
+		quicksort(arr,l,j-1);
+		quicksort(arr,j+1,r);
 	}
+		
+	
 
 	public void rank(){					// Part 2
 		int n = adj.size();
