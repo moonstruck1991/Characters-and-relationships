@@ -1,13 +1,18 @@
 import java.io.*;
 import java.util.Scanner;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Iterator;
 
 class node{
 	public String Id, Label;
+	public int Index;
 
-	public node(String Id, String Label){
+
+	public node(String Id, String Label, int Index){
 		this.Id = Id;
 		this.Label = Label;
+		this.Index = Index;
 	}
 
 	public String getId(){
@@ -17,12 +22,22 @@ class node{
 	public String getLabel(){
 		return this.Label;
 	}
+
+	public int getIndex(){
+		return this.Index;
+	}
+
 }
 
 
 class sizeNname{
 	int size;
 	String name;
+
+	public sizeNname(String name){
+		this.size = 1;
+		this.name = name;
+	}
 
 	public sizeNname(int size, String name){
 		this.name = name;
@@ -53,7 +68,7 @@ class edge{
 }
 
 class Graph{
-	ArrayList<ArrayList<String>> adj;   // adjacency list of the the given graph
+	ArrayList<ArrayList<sizeNname>> adj;   // adjacency list of the the given graph
 	ArrayList<edge> edgelist;			// list of edges
 	ArrayList<node> nodelist;			// list of nodes
 
@@ -71,19 +86,46 @@ class Graph{
   //     		System.out.print(edgelist.get(i).Source);
 		//  }
 		//  	 System.out.println(" ");
-		this.adj = new ArrayList<ArrayList<String>>();
+		this.adj = new ArrayList<ArrayList<sizeNname>>();
 		 for (int i = 0; i < nodelist.size(); i++) {
-      		ArrayList<String> adjnodes = new ArrayList<String>();
-      		adjnodes.add(nodelist.get(i).getId());
+      		ArrayList<sizeNname> adjnodes = new ArrayList<sizeNname>();
+      		adjnodes.add(new sizeNname(nodelist.get(i).getIndex() , nodelist.get(i).getId()));
       		for(int j = 0; j< edgelist.size(); j++){
       			if(edgelist.get(j).getS().compareTo(nodelist.get(i).getId()) == 0){
-      				adjnodes.add(edgelist.get(j).getT());
+      				int index = -1;
+      				for(int k =0; k< nodelist.size(); k++){
+      					if(nodelist.get(k).getId().compareTo(edgelist.get(j).getT()) == 0){
+      						index = nodelist.get(k).getIndex();
+      					}
+      				}
+
+      				adjnodes.add( new sizeNname(index, edgelist.get(j).getT()));
+      			}
+      			else if(edgelist.get(j).getT().compareTo(nodelist.get(i).getId()) == 0){
+      				int index = -1;
+      				for(int k =0; k< nodelist.size(); k++){
+      					if(nodelist.get(k).getId().compareTo(edgelist.get(j).getS()) == 0){
+      						index = nodelist.get(k).getIndex();
+      					}
+      				}
+
+      				adjnodes.add( new sizeNname(index, edgelist.get(j).getS()));
       			}
       		}
       		adj.add(adjnodes);
     	}
 
 	}
+
+	// public void printadj(){
+	// 	for(int i=0 ;i<adj.size();i++ ){
+
+	// 		for(int j=0; j< adj.get(i).size();j++){
+	// 			System.out.print(adj.get(i).get(j).name + ",");
+	// 		}
+	// 		System.out.println(" ");
+	// 	}
+	// }
 
 	public void aver(){				// Part 1
 		double a = ((double)this.edgelist.size())/this.nodelist.size();
@@ -101,11 +143,14 @@ class Graph{
 		int i = l;
 		int j = r;
 		while(i < j && i <=r ){
-			while(i <= r && (arr[i].size >= p.size || (arr[i].size == p.size && arr[i].name.compareTo(p.name) <= 0))){
+			while(i <= r && (arr[i].size > p.size || (arr[i].size == p.size && arr[i].name.compareTo(p.name) <= 0))){
 				i++;
+				
+				
 			}
 			while(j >= l && (arr[j].size < p.size || (arr[j].size == p.size && arr[j].name.compareTo(p.name) > 0))){
 				j--;
+			
 			}
 			if(i<j){
 				sizeNname temp = arr[i];
@@ -132,13 +177,13 @@ class Graph{
 			int cooccur = 0;
 			for(int j =0; j< m; j++){
 
-				if(edgelist.get(j).getS().compareTo(adj.get(i).get(0)) == 0 || edgelist.get(j).getT().compareTo(adj.get(i).get(0)) == 0){
+				if(edgelist.get(j).getS().compareTo(adj.get(i).get(0).name) == 0 || edgelist.get(j).getT().compareTo(adj.get(i).get(0).name) == 0){
 					cooccur = cooccur + edgelist.get(j).getW();
 				}
 			}
 	
-			sizeNname temp = new sizeNname( cooccur, adj.get(i).get(0));
-			sNn[i]= temp;
+			sNn[i] = new sizeNname( cooccur, adj.get(i).get(0).name);
+			
 			
 		}
 
@@ -148,11 +193,53 @@ class Graph{
 		this.qsort(sNn, 0, n-1);		// sorting acc. to size 
 		for(int i=0; i<n; i++){
 			System.out.print(sNn[i].name + ",");
-
-	
+			System.out.println(sNn[i].size + ",");	
 		}					
 	} 
 
+	public void independantStorylines(){
+		int n = this.nodelist.size();
+
+		sizeNname[] connected = new sizeNname[n];
+		for(int i=0; i<n; i++){
+			connected[i] = adj.get(i).get(0);
+			connected[i].size = 0;
+		}
+		int num = 1;
+		for(int i =0; i<n; i++){
+			if(connected[i].size == 0 ){
+				ArrayList<sizeNname> onecc = new ArrayList<sizeNname>();
+
+				ArrayList<sizeNname> cc = new ArrayList<sizeNname>();
+				
+				cc.add(connected[i]);
+				while(!cc.isEmpty()){
+					
+					connected[cc.get(0).size].size = num;
+					onecc.add(new sizeNname(cc.get(0).name));
+					cc.remove(0);
+
+					for(int x=0; x< adj.get(i).size(); x++){
+						if(connected[adj.get(i).get(x).size].size == 0){
+							cc.add(adj.get(i).get(x));
+						}
+					}
+				}
+				sizeNname[] concomp = new sizeNname[onecc.size()];
+				for(int z=0; z < onecc.size();z++){
+					concomp[z] = onecc.get(z);
+				}
+				// this.qsort(concomp,0,onecc.size());
+				for(int z=0; z < onecc.size();z++){
+					System.out.println(concomp[z].name + ",");
+				}
+				System.out.println();
+				num++;
+			}
+		}
+
+
+	}
 
 }
 
@@ -161,19 +248,21 @@ public class assignment4{
 		Scanner sc= new Scanner(System.in);
 		ArrayList<node> nodelist = new ArrayList<node>();
 		ArrayList<edge> edgelist = new ArrayList<edge>();
-		node temp = new node("aa","aa");
+		node temp = new node("aa","aa",0);
 		nodelist.add(temp);
-		temp = new node("bb","bb");
+		temp = new node("cc","cc",1);
 		nodelist.add(temp);
-		temp = new node("cc","cc");
+
+		temp = new node("bb","bb",2);
 		nodelist.add(temp);
-		temp = new node("dd","dd");
+
+		temp = new node("dd","dd",3);
 		nodelist.add(temp);
-		temp = new node("ee","ee");
+		temp = new node("ee","ee",4);
 		nodelist.add(temp);
-		temp = new node("ff","ff");
+		temp = new node("ff","ff",5);
 		nodelist.add(temp);
-		temp = new node("gg","gg");
+		temp = new node("gg","gg",6);
 		nodelist.add(temp);
 
 
@@ -185,6 +274,8 @@ public class assignment4{
 		edgelist.add(temp2);
 		temp2 = new edge("cc","aa",1);
 		edgelist.add(temp2);
+		temp2 = new edge("cc","bb",1);
+		edgelist.add(temp2);
 
 		temp2 = new edge("ee","ff",100);
 		edgelist.add(temp2);
@@ -195,7 +286,9 @@ public class assignment4{
 		
 
 		Graph G = new Graph(edgelist,nodelist);
-		
-		G.rank();
+		// G.aver();	
+		// G.rank();
+		// G.printadj();
+		G.independantStorylines();
 	}
 }
