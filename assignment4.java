@@ -128,7 +128,16 @@ class Graph{
 		int n = adj.size();
 		sizeNname[] sNn = new sizeNname[n];
 		for(int i=0; i<n; i++){			// size array
-			sizeNname temp = new sizeNname(adj.get(i).size() , adj.get(i).get(0));
+			int m = this.edgelist.size();
+			int cooccur = 0;
+			for(int j =0; j< m; j++){
+
+				if(edgelist.get(j).getS().compareTo(adj.get(i).get(0)) == 0 || edgelist.get(j).getT().compareTo(adj.get(i).get(0)) == 0){
+					cooccur = cooccur + edgelist.get(j).getW();
+				}
+			}
+	
+			sizeNname temp = new sizeNname( cooccur, adj.get(i).get(0));
 			sNn[i]= temp;
 			
 		}
@@ -138,7 +147,9 @@ class Graph{
 		// }
 		this.qsort(sNn, 0, n-1);		// sorting acc. to size 
 		for(int i=0; i<n; i++){
-			System.out.print(sNn[i].name + ",");	
+			System.out.print(sNn[i].name + ",");
+
+	
 		}					
 	} 
 
@@ -166,21 +177,16 @@ public class assignment4{
 		nodelist.add(temp);
 
 
-		edge temp2 = new edge("aa","bb",1);
+		edge temp2 = new edge("aa","bb",2);
 		edgelist.add(temp2);
 		temp2 = new edge("aa","dd",1);
-		edgelist.add(temp2);
-		temp2 = new edge("bb","aa",1);
 		edgelist.add(temp2);
 		temp2 = new edge("bb","dd",1);
 		edgelist.add(temp2);
 		temp2 = new edge("cc","aa",1);
 		edgelist.add(temp2);
-		temp2 = new edge("dd","aa",1);
-		edgelist.add(temp2);
-		temp2 = new edge("dd","bb",1);
-		edgelist.add(temp2);
-		temp2 = new edge("ee","ff",1);
+
+		temp2 = new edge("ee","ff",100);
 		edgelist.add(temp2);
 		temp2 = new edge("ff","gg",1);
 		edgelist.add(temp2);
