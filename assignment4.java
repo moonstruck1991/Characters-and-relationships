@@ -143,12 +143,12 @@ class Graph{
 		int i = l;
 		int j = r;
 		while(i < j && i <=r ){
-			while(i <= r && (arr[i].size > p.size || (arr[i].size == p.size && arr[i].name.compareTo(p.name) <= 0))){
+			while(i <= r && (arr[i].size > p.size || (arr[i].size == p.size && arr[i].name.compareTo(p.name) >= 0))){
 				i++;
 				
 				
 			}
-			while(j >= l && (arr[j].size < p.size || (arr[j].size == p.size && arr[j].name.compareTo(p.name) > 0))){
+			while(j >= l && (arr[j].size < p.size || (arr[j].size == p.size && arr[j].name.compareTo(p.name) < 0))){
 				j--;
 			
 			}
@@ -193,52 +193,45 @@ class Graph{
 		this.qsort(sNn, 0, n-1);		// sorting acc. to size 
 		for(int i=0; i<n; i++){
 			System.out.print(sNn[i].name + ",");
-			System.out.println(sNn[i].size + ",");	
+
 		}					
-	} 
+	}  
 
-	public void independantStorylines(){
-		int n = this.nodelist.size();
-
-		sizeNname[] connected = new sizeNname[n];
-		for(int i=0; i<n; i++){
-			connected[i] = adj.get(i).get(0);
-			connected[i].size = 0;
-		}
-		int num = 1;
-		for(int i =0; i<n; i++){
-			if(connected[i].size == 0 ){
-				ArrayList<sizeNname> onecc = new ArrayList<sizeNname>();
-
-				ArrayList<sizeNname> cc = new ArrayList<sizeNname>();
-				
-				cc.add(connected[i]);
-				while(!cc.isEmpty()){
-					
-					connected[cc.get(0).size].size = num;
-					onecc.add(new sizeNname(cc.get(0).name));
-					cc.remove(0);
-
-					for(int x=0; x< adj.get(i).size(); x++){
-						if(connected[adj.get(i).get(x).size].size == 0){
-							cc.add(adj.get(i).get(x));
-						}
-					}
-				}
-				sizeNname[] concomp = new sizeNname[onecc.size()];
-				for(int z=0; z < onecc.size();z++){
-					concomp[z] = onecc.get(z);
-				}
-				// this.qsort(concomp,0,onecc.size());
-				for(int z=0; z < onecc.size();z++){
-					System.out.println(concomp[z].name + ",");
-				}
-				System.out.println();
-				num++;
+	public void DFS(sizeNname v, boolean[] visited, ArrayList<sizeNname> res){
+		res.add(new sizeNname( v.name));
+		visited[v.size] = true;
+		for(int i = 0; i< adj.get(v.size).size();i++){
+			if(visited[adj.get(v.size).get(i).size] == false){
+				DFS(adj.get(v.size).get(i),visited,res);
 			}
 		}
+	}
+	public void independant_storylines_dfs(){
+		int n = this.nodelist.size();
+		boolean[] visited = new boolean[n];
+		for(int i=0; i< n; i++){
+			visited[i] = false;
+		}
 
+		for(int i=0; i<n;i++){
+			ArrayList<sizeNname> res = new ArrayList<sizeNname>();
+				
+			if(visited[i] == false){
 
+				DFS(adj.get(i).get(0),visited,res);
+				sizeNname[] resarr = new sizeNname[res.size()];
+				for(int j=0; j<res.size();j++){
+					resarr[j] = res.get(j);
+				}
+				this.qsort(resarr,0,res.size() -1);
+				for(int j=0; j<res.size();j++){
+					System.out.print(resarr[j].name + ",");
+				}
+				System.out.println();
+			}
+			
+
+		}
 	}
 
 }
@@ -287,8 +280,8 @@ public class assignment4{
 
 		Graph G = new Graph(edgelist,nodelist);
 		// G.aver();	
-		// G.rank();
+		G.rank();
 		// G.printadj();
-		G.independantStorylines();
+		// G.independant_storylines_dfs();
 	}
 }
