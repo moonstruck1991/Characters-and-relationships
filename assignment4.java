@@ -117,15 +117,16 @@ class Graph{
 
 	}
 
-	// public void printadj(){
-	// 	for(int i=0 ;i<adj.size();i++ ){
+	public void printadj(){
+		for(int i=0 ;i<adj.size();i++ ){
 
-	// 		for(int j=0; j< adj.get(i).size();j++){
-	// 			System.out.print(adj.get(i).get(j).name + ",");
-	// 		}
-	// 		System.out.println(" ");
-	// 	}
-	// }
+			for(int j=0; j< adj.get(i).size();j++){
+				System.out.print(adj.get(i).get(j).name + ",");
+			}
+
+			System.out.println(adj.get(i).get(0).size);
+		}
+	}
 
 	public void aver(){				// Part 1
 		double a = ((double)this.edgelist.size())/this.nodelist.size();
@@ -237,51 +238,44 @@ class Graph{
 }
 
 public class assignment4{
-	public static void main(String[] args) {
-		Scanner sc= new Scanner(System.in);
+	public static void main(String[] args) throws IOException {
+		
+		String line = "";  
+		String splitBy = ",";
+		BufferedReader br = new BufferedReader(new FileReader("nodes_test.csv"));
+		BufferedReader br2 = new BufferedReader(new FileReader("edges_test.csv"));
+
 		ArrayList<node> nodelist = new ArrayList<node>();
 		ArrayList<edge> edgelist = new ArrayList<edge>();
-		node temp = new node("aa","aa",0);
-		nodelist.add(temp);
-		temp = new node("cc","cc",1);
-		nodelist.add(temp);
+		int i=0;
+		while ((line = br.readLine()) != null){
+			String[] new_node = line.split(splitBy);
+			nodelist.add(new node(new_node[0], new_node[1],i));
+			i++;
+		}
+		i=0;
+		while ((line = br2.readLine()) != null){
+			String[] new_edge = line.split(splitBy);
+			edgelist.add(new edge(new_edge[0], new_edge[1],Integer.parseInt(new_edge[2])));
+			i++;
+		}
 
-		temp = new node("bb","bb",2);
-		nodelist.add(temp);
-
-		temp = new node("dd","dd",3);
-		nodelist.add(temp);
-		temp = new node("ee","ee",4);
-		nodelist.add(temp);
-		temp = new node("ff","ff",5);
-		nodelist.add(temp);
-		temp = new node("gg","gg",6);
-		nodelist.add(temp);
-
-
-		edge temp2 = new edge("aa","bb",2);
-		edgelist.add(temp2);
-		temp2 = new edge("aa","dd",1);
-		edgelist.add(temp2);
-		temp2 = new edge("bb","dd",1);
-		edgelist.add(temp2);
-		temp2 = new edge("cc","aa",1);
-		edgelist.add(temp2);
-		temp2 = new edge("cc","bb",1);
-		edgelist.add(temp2);
-
-		temp2 = new edge("ee","ff",100);
-		edgelist.add(temp2);
-		temp2 = new edge("ff","gg",1);
-		edgelist.add(temp2);
-		temp2 = new edge("gg","ee",1);
-		edgelist.add(temp2);
-		
 
 		Graph G = new Graph(edgelist,nodelist);
+
 		// G.aver();	
-		G.rank();
+		// System.out.println("--------------");
+	
+
+		// G.rank();
+		// System.out.println("");
+		// System.out.println("--------------");
+
+
 		// G.printadj();
-		// G.independant_storylines_dfs();
+		// System.out.println("");
+		// System.out.println("--------------");
+
+		G.independant_storylines_dfs();
 	}
 }
