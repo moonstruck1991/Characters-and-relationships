@@ -129,7 +129,7 @@ class Graph{
 	}
 
 	public void aver(){				// Part 1
-		double a = ((double)this.edgelist.size())/this.nodelist.size();
+		double a = 2*((double)this.edgelist.size())/this.nodelist.size();
 		double roundOff = Math.round(a*100.0)/100.0;
 
     	System.out.println(roundOff);
@@ -193,8 +193,12 @@ class Graph{
 		// }
 		this.qsort(sNn, 0, n-1);		// sorting acc. to size 
 		for(int i=0; i<n; i++){
+			if(i == n-1){
+				System.out.print(sNn[i].name);				
+			}
+			else{
 			System.out.print(sNn[i].name + ",");
-
+			}
 		}					
 	}  
 
@@ -220,13 +224,18 @@ class Graph{
 			if(visited[i] == false){
 
 				DFS(adj.get(i).get(0),visited,res);
-				sizeNname[] resarr = new sizeNname[res.size()];
-				for(int j=0; j<res.size();j++){
+				int x = res.size();
+				sizeNname[] resarr = new sizeNname[x];
+				for(int j=0; j<x;j++){
 					resarr[j] = res.get(j);
 				}
-				this.qsort(resarr,0,res.size() -1);
-				for(int j=0; j<res.size();j++){
-					System.out.print(resarr[j].name + ",");
+				this.qsort(resarr,0,x -1);
+				for(int j=0; j<x;j++){
+					if(j == x-1){
+						System.out.print(resarr[j].name);
+					}
+					else{
+					System.out.print(resarr[j].name + ",");}
 				}
 				System.out.println();
 			}
@@ -242,39 +251,94 @@ public class assignment4{
 		
 		String line = "";  
 		String splitBy = ",";
-		BufferedReader br = new BufferedReader(new FileReader("nodes_test.csv"));
-		BufferedReader br2 = new BufferedReader(new FileReader("edges_test.csv"));
+		BufferedReader br = new BufferedReader(new FileReader("nodes.csv"));
+		BufferedReader br2 = new BufferedReader(new FileReader("edges.csv"));
 
 		ArrayList<node> nodelist = new ArrayList<node>();
 		ArrayList<edge> edgelist = new ArrayList<edge>();
 		int i=0;
+		line = br.readLine();
 		while ((line = br.readLine()) != null){
-			String[] new_node = line.split(splitBy);
+			String[] new_node = new String[2];
+			new_node[0] = "";
+			new_node[1] = "";
+			boolean insidequotes = false;
+			int j=0;
+			for(int k=0; k< line.length();k++){
+				if(line.charAt(k) == ',' && insidequotes == false){
+					j++;
+				}
+				else if(line.charAt(k) == '"'){
+					if(insidequotes){
+						insidequotes = false;
+
+					}
+					else{
+						insidequotes = true;
+					} 
+
+				}
+				else{
+					new_node[j] = new_node[j] + line.charAt(k);
+				}
+			}
 			nodelist.add(new node(new_node[0], new_node[1],i));
 			i++;
 		}
-		i=0;
+		
+		line = br2.readLine();		
 		while ((line = br2.readLine()) != null){
-			String[] new_edge = line.split(splitBy);
+			String[] new_edge = new String[3];
+			new_edge[0] = "";
+			new_edge[1] = "";
+			new_edge[2] = "";
+			int j = 0;
+			boolean insidequotes = false;
+			for(int k=0; k< line.length();k++){
+				if(line.charAt(k) == ',' && insidequotes == false){
+					j++;
+				}
+				else if(line.charAt(k) == '"'){
+					if(insidequotes){
+						insidequotes = false;
+
+					}
+					else{
+						insidequotes = true;
+					}
+
+				}
+				else{
+					new_edge[j] = new_edge[j] + line.charAt(k);
+				}
+			}
+
 			edgelist.add(new edge(new_edge[0], new_edge[1],Integer.parseInt(new_edge[2])));
-			i++;
+			
 		}
 
 
 		Graph G = new Graph(edgelist,nodelist);
 
-		// G.aver();	
-		// System.out.println("--------------");
+		G.aver();	
+		System.out.println("--------------");
 	
 
-		// G.rank();
+		G.rank();
 		// System.out.println("");
 		// System.out.println("--------------");
 
+		// System.out.println(edgelist.get(2).getT());
+
+		// System.out.println(edgelist.get(2).getS());
+
+		// System.out.println(edgelist.get(2).getW());
+		// System.out.println(nodelist.get(4).getId());
+		// System.out.println(nodelist.get(4).getLabel());
 
 		// G.printadj();
-		// System.out.println("");
-		// System.out.println("--------------");
+		System.out.println("");
+		System.out.println("--------------");
 
 		G.independant_storylines_dfs();
 	}
