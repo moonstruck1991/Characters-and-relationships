@@ -2,6 +2,8 @@ import java.io.*;
 import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Iterator;
 
 class node{
@@ -33,15 +35,18 @@ class node{
 class sizeNname{
 	int size;
 	String name;
+	boolean visited;
 
 	public sizeNname(String name){
 		this.size = 1;
 		this.name = name;
+		this.visited = false;
 	}
 
 	public sizeNname(int size, String name){
 		this.name = name;
 		this.size = size;
+		this.visited = false;
 	}
 }
 
@@ -68,72 +73,52 @@ class edge{
 }
 
 class Graph{
-	ArrayList<ArrayList<sizeNname>> adj;   // adjacency list of the the given graph
-	ArrayList<edge> edgelist;			// list of edges
-	ArrayList<node> nodelist;			// list of nodes
+	ArrayList<node> nodelist;
+	ArrayList<edge> edgelist;
+	int n;
+	int m;
+	HashMap<String, ArrayList<sizeNname>> adj;
 
-	public Graph(ArrayList<edge> edgelist, ArrayList<node> nodelist){
-		this.edgelist = edgelist;
+	public Graph(ArrayList<node> nodelist, ArrayList<edge> edgelist){
 		this.nodelist = nodelist;
-		// System.out.println("nodes");
-		//  for (int i = 0; i < nodelist.size(); i++) {
-  //     		System.out.print(nodelist.get(i).Id);
-		//  }
-		//  System.out.println(" ");
-		//  		 System.out.print("edges");
-		//  		 System.out.println(" " + edgelist.size());
-		//  for (int i = 0; i < edgelist.size(); i++) {
-  //     		System.out.print(edgelist.get(i).Source);
-		//  }
-		//  	 System.out.println(" ");
-		this.adj = new ArrayList<ArrayList<sizeNname>>();
-		 for (int i = 0; i < nodelist.size(); i++) {
-      		ArrayList<sizeNname> adjnodes = new ArrayList<sizeNname>();
-      		adjnodes.add(new sizeNname(nodelist.get(i).getIndex() , nodelist.get(i).getId()));
-      		for(int j = 0; j< edgelist.size(); j++){
-      			if(edgelist.get(j).getS().compareTo(nodelist.get(i).getId()) == 0){
-      				int index = -1;
-      				for(int k =0; k< nodelist.size(); k++){
-      					if(nodelist.get(k).getId().compareTo(edgelist.get(j).getT()) == 0){
-      						index = nodelist.get(k).getIndex();
-      					}
-      				}
+		this.edgelist = edgelist;
+		this.n = nodelist.size();
+		this.m = edgelist.size();
+		this.adj = new HashMap<>();
 
-      				adjnodes.add( new sizeNname(index, edgelist.get(j).getT()));
-      			}
-      			else if(edgelist.get(j).getT().compareTo(nodelist.get(i).getId()) == 0){
-      				int index = -1;
-      				for(int k =0; k< nodelist.size(); k++){
-      					if(nodelist.get(k).getId().compareTo(edgelist.get(j).getS()) == 0){
-      						index = nodelist.get(k).getIndex();
-      					}
-      				}
-
-      				adjnodes.add( new sizeNname(index, edgelist.get(j).getS()));
-      			}
-      		}
-      		adj.add(adjnodes);
-    	}
-
-	}
-
-	public void printadj(){
-		for(int i=0 ;i<adj.size();i++ ){
-
-			for(int j=0; j< adj.get(i).size();j++){
-				System.out.print(adj.get(i).get(j).name + ",");
-			}
-
-			System.out.println(adj.get(i).get(0).size);
+		for(int i=0;i<n;i++){
+			ArrayList<sizeNname> adjnodes = new ArrayList<sizeNname>();
+			adjnodes.add(new sizeNname( 0,nodelist.get(i).getId()));
+			adj.put(nodelist.get(i).getId(), adjnodes);
 		}
+
+		for(int i=0; i<m;i++){
+			edge temp = edgelist.get(i);
+			
+
+			adj.get(temp.getS()).add(new sizeNname( temp.getW(),temp.getT()));
+			adj.get(temp.getT()).add(new sizeNname( temp.getW(),temp.getS()));
+		}
+
 	}
 
-	public void aver(){				// Part 1
-		double a = 2*((double)this.edgelist.size())/this.nodelist.size();
+	public void aver(){
+		double a = 2*((double)m)/n;
 		double roundOff = Math.round(a*100.0)/100.0;
 
     	System.out.println(roundOff);
 	}
+
+
+	public void printadj(){
+		for(String i: adj.keySet()){
+			for(int j=0; j< adj.get(i).size();j++){
+				System.out.print(adj.get(i).get(j).name);
+			}
+			System.out.println("");
+		}
+	}
+
 
 	public void qsort(sizeNname[] arr, int l, int r){
 		if(l>=r){
@@ -167,25 +152,18 @@ class Graph{
 		qsort(arr,l,j-1);
 		qsort(arr,j+1,r);
 	}
-		
-	
 
 	public void rank(){					// Part 2
-		int n = adj.size();
+		
 		sizeNname[] sNn = new sizeNname[n];
-		for(int i=0; i<n; i++){			// size array
-			int m = this.edgelist.size();
+		int k=0;
+		for(String i: adj.keySet()){			// size array
 			int cooccur = 0;
-			for(int j =0; j< m; j++){
-
-				if(edgelist.get(j).getS().compareTo(adj.get(i).get(0).name) == 0 || edgelist.get(j).getT().compareTo(adj.get(i).get(0).name) == 0){
-					cooccur = cooccur + edgelist.get(j).getW();
-				}
+			for(int j=0; j< adj.get(i).size(); j++){
+				cooccur = cooccur + adj.get(i).get(j).size;
 			}
-	
-			sNn[i] = new sizeNname( cooccur, adj.get(i).get(0).name);
-			
-			
+			sNn[k] = new sizeNname(cooccur, adj.get(i).get(0).name);
+			k++;
 		}
 
 		// for(int i=0; i<n; i++){
@@ -199,31 +177,32 @@ class Graph{
 			else{
 			System.out.print(sNn[i].name + ",");
 			}
-		}					
-	}  
+		}
+		System.out.println("");					
+	}
 
-	public void DFS(sizeNname v, boolean[] visited, ArrayList<sizeNname> res){
-		res.add(new sizeNname( v.name));
-		visited[v.size] = true;
-		for(int i = 0; i< adj.get(v.size).size();i++){
-			if(visited[adj.get(v.size).get(i).size] == false){
-				DFS(adj.get(v.size).get(i),visited,res);
+
+	public void DFS(sizeNname v, ArrayList<sizeNname> res){
+		res.add(new sizeNname(v.name));
+		// System.out.print(v.name);
+		// System.out.println(v.visited);
+		adj.get(v.name).get(0).visited = true;
+		for(int i = 0; i< adj.get(v.name).size();i++){
+			if(adj.get(adj.get(v.name).get(i).name).get(0).visited == false){
+				DFS(adj.get(v.name).get(i),res);
 			}
 		}
 	}
-	public void independant_storylines_dfs(){
-		int n = this.nodelist.size();
-		boolean[] visited = new boolean[n];
-		for(int i=0; i< n; i++){
-			visited[i] = false;
-		}
 
-		for(int i=0; i<n;i++){
+	public void independant_storylines_dfs(){
+		
+		for(String i: adj.keySet()){
 			ArrayList<sizeNname> res = new ArrayList<sizeNname>();
 				
-			if(visited[i] == false){
-
-				DFS(adj.get(i).get(0),visited,res);
+			 
+			if(adj.get(i).get(0).visited == false){
+				
+				DFS(adj.get(i).get(0),res);
 				int x = res.size();
 				sizeNname[] resarr = new sizeNname[x];
 				for(int j=0; j<x;j++){
@@ -242,7 +221,8 @@ class Graph{
 			
 
 		}
-	}
+	}  
+
 
 }
 
@@ -321,7 +301,7 @@ public class assignment4{
 		}
 
 
-		Graph G = new Graph(edgelist,nodelist);
+		Graph G = new Graph(nodelist,edgelist);
 
 		if(func.compareTo("average")==0){
 			G.aver();	
@@ -336,6 +316,6 @@ public class assignment4{
 			G.independant_storylines_dfs();
 		}
 		
-		// G.printadj();
+		
 	}
 }
