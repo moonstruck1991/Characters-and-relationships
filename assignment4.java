@@ -249,10 +249,13 @@ class Graph{
 public class assignment4{
 	public static void main(String[] args) throws IOException {
 		
-		String line = "";  
-		String splitBy = ",";
-		BufferedReader br = new BufferedReader(new FileReader("nodes.csv"));
-		BufferedReader br2 = new BufferedReader(new FileReader("edges.csv"));
+	String nodesFile = args[0];
+		String edgesFile = args[1];
+		String func = args[2];
+		String line = "";
+		
+		BufferedReader br = new BufferedReader(new FileReader(nodesFile));
+		BufferedReader br2 = new BufferedReader(new FileReader(edgesFile));
 
 		ArrayList<node> nodelist = new ArrayList<node>();
 		ArrayList<edge> edgelist = new ArrayList<edge>();
@@ -320,26 +323,19 @@ public class assignment4{
 
 		Graph G = new Graph(edgelist,nodelist);
 
-		G.aver();	
-		System.out.println("--------------");
-	
+		if(func.compareTo("average")==0){
+			G.aver();	
+		}
 
-		G.rank();
-		// System.out.println("");
-		// System.out.println("--------------");
+		else if(func.compareTo("rank") == 0){
+			 G.rank();
+		}
 
-		// System.out.println(edgelist.get(2).getT());
 
-		// System.out.println(edgelist.get(2).getS());
-
-		// System.out.println(edgelist.get(2).getW());
-		// System.out.println(nodelist.get(4).getId());
-		// System.out.println(nodelist.get(4).getLabel());
-
+		else if(func.compareTo("independent_storylines_dfs")==0){
+			G.independant_storylines_dfs();
+		}
+		
 		// G.printadj();
-		System.out.println("");
-		System.out.println("--------------");
-
-		G.independant_storylines_dfs();
 	}
 }
