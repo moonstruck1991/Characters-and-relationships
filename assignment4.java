@@ -196,6 +196,7 @@ class Graph{
 
 	public void independant_storylines_dfs(){
 		
+		HashMap<String, sizeNname[]> tempHash = new HashMap<>();
 		for(String i: adj.keySet()){
 			ArrayList<sizeNname> res = new ArrayList<sizeNname>();
 				
@@ -209,17 +210,46 @@ class Graph{
 					resarr[j] = res.get(j);
 				}
 				this.qsort(resarr,0,x -1);
-				for(int j=0; j<x;j++){
-					if(j == x-1){
-						System.out.print(resarr[j].name);
-					}
-					else{
-					System.out.print(resarr[j].name + ",");}
-				}
-				System.out.println();
+
+
+				tempHash.put(resarr[0].name, resarr);
+				// for(int j=0; j<x;j++){
+				// 	if(j == x-1){
+				// 		System.out.print(resarr[j].name);
+				// 	}
+				// 	else{
+				// 	System.out.print(resarr[j].name + ",");}
+				// }
+				// System.out.println();
 			}
 			
 
+		}
+
+		sizeNname[] temparr = new sizeNname[tempHash.size()];
+		int count=0;
+		for(String i: tempHash.keySet()){
+			temparr[count] = new sizeNname(tempHash.get(i).length, i);
+			
+
+			count++;
+		}
+
+		this.qsort(temparr,0,temparr.length -1);
+
+
+		for(int i=0; i<temparr.length;i++){
+
+			for(int l=0; l< tempHash.get(temparr[i].name).length; l++){
+				if(l == tempHash.get(temparr[i].name).length - 1){
+					System.out.print(tempHash.get(temparr[i].name)[l].name);	
+				}
+				else{
+				System.out.print(tempHash.get(temparr[i].name)[l].name + ",");
+				}
+			}
+
+			System.out.println("");
 		}
 	}  
 
